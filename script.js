@@ -2167,3 +2167,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init app
   init();
 });
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const deviceRef = doc(db, "devices", "ps1");
+
+onSnapshot(deviceRef, (docSnap) => {
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+
+    document.getElementById("time").innerText = data.time;
+    document.getElementById("price").innerText = data.price;
+  }
+});
