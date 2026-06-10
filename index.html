@@ -12,18 +12,33 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "هنا تحط كودك",
-  authDomain: "هنا",
-  projectId: "هنا",
+  apiKey: "AIzaSyDGzgQoM1kQwQ0wfRMF4wO_bAZCPAUuErY",
+  authDomain: "gamenest-bdfe1.firebaseapp.com",
+  projectId: "gamenest-bdfe1",
+  storageBucket: "gamenest-bdfe1.firebasestorage.app",
+  messagingSenderId: "739131549001",
+  appId: "1:739131549001:web:efce2d662abc4115a0a698",
+  measurementId: "G-2X49HCD4X7"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 console.log("Firebase connected");
-</script>
-<body>
+</script> <body>
   <!-- Loading Screen -->
   <div id="loading-screen">
     <div class="spinner"></div>
