@@ -2179,3 +2179,4 @@ onSnapshot(deviceRef, (docSnap) => {
     document.getElementById("price").innerText = data.price;
   }
 });
+console.log("Firebase connected");
