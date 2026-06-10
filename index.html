@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RABUN AZAD Gaming Center</title>
+  <link rel="icon" href="logo.jpg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Main App -->
+  <div id="app" style="display:none;">
+
+    <!-- ====== HEADER ====== -->
+    <header id="main-header">
+      <div class="header-inner">
+        <div class="header-left">
+          <img src="logo.jpg" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+          <div>
+            <h1 class="header-title" id="header-center-name"></h1>
+            <p class="header-subtitle" id="header-subtitle"></p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-outline-sm copy-url-btn" id="copy-url-btn" onclick="copyUrl()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="copy-url-text"></span>
+          </button>
+          <select class="lang-select" id="lang-select" onchange="changeLanguage(this.value)">
+            <option value="ku">کوردی</option>
+            <option value="ar">عربي</option>
+            <option value="en">English</option>
+          </select>
+          <div id="auth-buttons"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====== NOTIFICATION PANEL ====== -->
+    <div id="notif-panel-overlay" class="panel-overlay" onclick="closeNotifPanel()"></div>
+    <div id="notif-panel" class="side-panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="panel-title" id="notif-panel-title"></span>
+        </div>
+        <button class="btn-icon" onclick="closeNotifPanel()">&times;</button>
+      </div>
+      <div class="panel-actions">
+        <button class="btn btn-orange btn-xs" onclick="markAllRead()">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="mark-read-text"></span>
+        </button>
+        <button class="btn btn-red-outline btn-xs" onclick="clearNotifHistory()">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          <span id="clear-history-text"></span>
+        </button>
+      </div>
+      <div id="notif-panel-list" class="panel-list"></div>
+    </div>
+
+    <!-- ====== LOGIN MODAL ====== -->
+    <div id="login-modal-overlay" class="modal-overlay" onclick="closeLoginModal()"></div>
+    <div id="login-modal" class="modal">
+      <h2 class="modal-title" id="login-title"></h2>
+      <div class="modal-body">
+        <div class="form-group">
+          <label id="username-label"></label>
+          <input type="text" id="login-user" dir="ltr" class="input-dark">
+        </div>
+        <div class="form-group">
+          <label id="password-label"></label>
+          <input type="password" id="login-pass" dir="ltr" class="input-dark" onkeydown="if(event.key==='Enter')handleLogin()">
+        </div>
+        <p id="login-error" class="error-text" style="display:none;"></p>
+        <button class="btn btn-gradient w-full" id="login-btn" onclick="handleLogin()"></button>
+      </div>
+    </div>
+
+    <!-- ====== ALARM MODAL ====== -->
+    <div id="alarm-modal-overlay" class="modal-overlay" onclick="closeAlarmModal()"></div>
+    <div id="alarm-modal" class="modal">
+      <h2 class="modal-title alarm-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="alarm-modal-title-text"></span>
+      </h2>
+      <div class="modal-body">
+        <p class="alarm-station-name" id="alarm-station-name"></p>
+        <div id="alarm-current-info" class="alarm-current-box"></div>
+        <p class="section-label" id="quick-set-label"></p>
+        <div class="alarm-presets">
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(15)">15 <small id="min-unit"></small></button>
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(30)">30 <small id="min-unit2"></small></button>
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(45)">45 <small id="min-unit3"></small></button>
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(60)">60 <small id="min-unit4"></small></button>
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(90)">90 <small id="min-unit5"></small></button>
+          <button class="btn btn-outline-sm" onclick="setAlarmPreset(120)">120 <small id="min-unit6"></small></button>
+        </div>
+        <p class="section-label" id="custom-min-label"></p>
+        <div class="alarm-custom-row">
+          <input type="number" min="1" id="alarm-custom-input" dir="ltr" class="input-dark alarm-custom-input" placeholder="0">
+          <button class="btn btn-purple" onclick="setAlarmCustom()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="alarm-set-btn-text"></span>
+          </button>
+        </div>
+        <button id="alarm-off-btn" class="btn btn-red-outline w-full" style="display:none;" onclick="turnOffAlarm()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+          <span id="alarm-off-text"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CUSTOMER VIEW ====== -->
+    <div id="customer-view">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-bg">
+          <div class="hero-blob hero-blob-purple"></div>
+          <div class="hero-blob hero-blob-cyan"></div>
+        </div>
+        <div class="hero-content">
+          <img src="logo.jpg" alt="Logo" class="hero-logo" onerror="this.style.display='none'">
+          <h1 class="hero-title" id="hero-center-name"></h1>
+          <p class="hero-subtitle" id="hero-subtitle"></p>
+          <div class="hero-qr-wrap">
+            <div class="qr-box" id="hero-qr-box"></div>
+            <button class="btn btn-outline-sm copy-url-btn-hero" id="copy-url-btn-hero" onclick="copyUrl()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span id="copy-url-text-hero"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="section">
+        <h2 class="section-title" id="our-services-title"></h2>
+        <div class="categories-grid">
+          <div class="category-card cat-ps5">
+            <div class="cat-icon cat-icon-blue">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+            </div>
+            <h3 class="cat-title cat-title-blue" id="ps5-cat-title"></h3>
+            <p class="cat-count" id="ps5-stations-count"></p>
+            <div class="cat-price">
+              <span class="cat-price-val cat-price-blue" id="ps5-rate-display"></span>
+              <span class="cat-price-label" id="ps5-per-hour"></span>
+              <span class="cat-price-sub" id="ps5-bo3-rate-display"></span>
+            </div>
+          </div>
+          <div class="category-card cat-xbox">
+            <div class="cat-icon cat-icon-green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <h3 class="cat-title cat-title-green" id="xbox-cat-title"></h3>
+            <p class="cat-count" id="xbox-stations-count"></p>
+            <div class="cat-price">
+              <span class="cat-price-val cat-price-green" id="xbox-rate-display"></span>
+              <span class="cat-price-label" id="xbox-per-hour"></span>
+            </div>
+          </div>
+          <div class="category-card cat-billiard">
+            <div class="cat-icon cat-icon-amber">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <h3 class="cat-title cat-title-amber" id="billiard-cat-title"></h3>
+            <p class="cat-count" id="billiard-tables-count"></p>
+            <div class="cat-price">
+              <span class="cat-price-val-sm cat-price-amber" id="billiard-single-display"></span>
+              <span class="cat-price-label" id="billiard-per-game"></span>
+              <span class="cat-price-val-sm cat-price-amber" id="billiard-double-display"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Available Games -->
+      <section class="section">
+        <h2 class="section-title" id="available-games-title"></h2>
+        <div class="games-customer-grid">
+          <div>
+            <h3 class="games-section-label games-section-label-blue">PS5</h3>
+            <div class="games-list" id="ps5-games-customer"></div>
+          </div>
+          <div>
+            <h3 class="games-section-label games-section-label-green">Xbox</h3>
+            <div class="games-list" id="xbox-games-customer"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Status -->
+      <section class="section">
+        <h2 class="section-title" id="live-status-title"></h2>
+        <div class="live-grid" id="live-status-grid"></div>
+      </section>
+
+      <!-- Menu -->
+      <section class="section">
+        <h2 class="section-title" id="menu-title"></h2>
+        <div class="menu-customer-grid">
+          <div>
+            <h3 class="menu-section-label menu-section-label-cyan" id="drinks-title"></h3>
+            <div class="menu-list" id="drinks-list"></div>
+          </div>
+          <div>
+            <h3 class="menu-section-label menu-section-label-amber" id="snacks-title"></h3>
+            <div class="menu-list" id="snacks-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reservation Form -->
+      <section class="section reservation-section">
+        <h2 class="section-title" id="reserve-title"></h2>
+        <div class="reservation-card">
+          <div id="reservation-form-container">
+            <div class="form-group">
+              <label id="customer-name-label"></label>
+              <input type="text" id="res-name" class="input-dark">
+            </div>
+            <div class="form-group">
+              <label id="phone-number-label"></label>
+              <input type="text" id="res-phone" dir="ltr" placeholder="07xxxxxxxxx" class="input-dark">
+            </div>
+            <div class="form-group">
+              <label id="station-type-label"></label>
+              <select id="res-type" class="select-dark">
+                <option value="PS5">PlayStation 5</option>
+                <option value="XBOX">Xbox</option>
+                <option value="BILLIARD" id="res-billiard-option"></option>
+              </select>
+            </div>
+            <button class="btn btn-gradient w-full" id="reserve-btn" onclick="submitReservation()"></button>
+          </div>
+          <div id="reservation-success" style="display:none;" class="reservation-success">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p id="reservation-success-text"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fixed QR -->
+      <div class="fixed-qr" id="fixed-qr-box"></div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p class="footer-text" id="footer-powered"></p>
+        <p class="footer-sub" id="footer-rights"></p>
+      </footer>
+    </div>
+
+    <!-- ====== ADMIN DASHBOARD ====== -->
+    <div id="admin-view" style="display:none;">
+      <div class="admin-container">
+        <button class="btn btn-gradient back-btn" onclick="goToCustomerView()">
+          <span id="back-arrow">&#8592;</span>
+          <span id="back-to-home-text"></span>
+        </button>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab" data-tab="ps5" onclick="switchAdminTab('ps5')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+            PS5
+          </button>
+          <button class="admin-tab" data-tab="xbox" onclick="switchAdminTab('xbox')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Xbox
+          </button>
+          <button class="admin-tab" data-tab="billiard" onclick="switchAdminTab('billiard')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            <span id="admin-billiard-tab-text"></span>
+          </button>
+          <button class="admin-tab" data-tab="menu" onclick="switchAdminTab('menu')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            <span id="admin-menu-tab-text"></span>
+          </button>
+          <button class="admin-tab" data-tab="games" onclick="switchAdminTab('games')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/></svg>
+            <span id="admin-games-tab-text"></span>
+          </button>
+          <button class="admin-tab" data-tab="reservations" onclick="switchAdminTab('reservations')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="admin-reservations-tab-text"></span>
+          </button>
+          <button class="admin-tab" data-tab="revenue" onclick="switchAdminTab('revenue')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <span id="admin-revenue-tab-text"></span>
+          </button>
+          <button class="admin-tab" data-tab="notifications" onclick="switchAdminTab('notifications')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span id="admin-notif-tab-text"></span>
+            <span id="admin-notif-badge" class="notif-badge" style="display:none;"></span>
+          </button>
+          <button class="admin-tab" data-tab="settings" onclick="switchAdminTab('settings')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            <span id="admin-settings-tab-text"></span>
+          </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="admin-tab-content">
+          <div id="tab-ps5" class="tab-panel" style="display:none;"></div>
+          <div id="tab-xbox" class="tab-panel" style="display:none;"></div>
+          <div id="tab-billiard" class="tab-panel" style="display:none;"></div>
+          <div id="tab-menu" class="tab-panel" style="display:none;"></div>
+          <div id="tab-games" class="tab-panel" style="display:none;"></div>
+          <div id="tab-reservations" class="tab-panel" style="display:none;"></div>
+          <div id="tab-revenue" class="tab-panel" style="display:none;"></div>
+          <div id="tab-notifications" class="tab-panel" style="display:none;"></div>
+          <div id="tab-settings" class="tab-panel" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
